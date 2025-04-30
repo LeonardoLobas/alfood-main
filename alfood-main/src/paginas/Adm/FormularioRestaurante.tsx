@@ -1,4 +1,5 @@
 import { Button, TextField } from "@mui/material";
+import axios from "axios";
 import React from "react";
 
 const FormularioRestaurante = () => {
@@ -6,7 +7,20 @@ const FormularioRestaurante = () => {
 
     const aoSubmeterForm = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log(nomeRestaurante);
+        const postNameRestaurant = async () => {
+            try {
+                const resposta = await axios.post(
+                    "http://localhost:8000/api/v2/restaurantes/",
+                    {
+                        nome: nomeRestaurante,
+                    }
+                );
+                console.log(resposta);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        postNameRestaurant();
     };
 
     return (
