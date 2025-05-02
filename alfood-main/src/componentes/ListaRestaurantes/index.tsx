@@ -8,31 +8,31 @@ import { IPaginacao } from "../../interfaces/IPaginacao";
 const ListaRestaurantes = () => {
     const [restaurantes, setRestaurantes] = React.useState<IRestaurante[]>([]);
     const [proximaPagina, setProximaPagina] = React.useState("");
+    const [paginaAnterior, setPaginaAnterior] = React.useState("");
 
-    useEffect(() => {
-        async function fetchRestaurantes() {
-            try {
-                const resposta = await axios.get<IPaginacao<IRestaurante>>(
-                    "http://localhost:8000/api/v1/restaurantes/"
-                );
-                setRestaurantes(resposta.data.results);
-                setProximaPagina(resposta.data.next);
-            } catch (erro) {
-                console.error(erro);
-            }
-        }
-        fetchRestaurantes();
-    }, []);
-    async function verMais(): Promise<void> {
+    async function fetchRestaurantes(url: string) {
         try {
-            const resposta =
-                await axios.get<IPaginacao<IRestaurante>>(proximaPagina);
-            setRestaurantes([...restaurantes, ...resposta.data.results]);
+            const resposta = await axios.get<IPaginacao<IRestaurante>>(url);
+            setRestaurantes(resposta.data.results);
             setProximaPagina(resposta.data.next);
+            setPaginaAnterior(resposta.data.previous);
         } catch (erro) {
             console.error(erro);
         }
     }
+    useEffect(() => {
+        fetchRestaurantes("http://localhost:8000/api/v1/restaurantes/");
+    }, []);
+    // async function verMais(): Promise<void> {
+    //     try {
+    //         const resposta =
+    //             await axios.get<IPaginacao<IRestaurante>>(proximaPagina);
+    //         setRestaurantes([...restaurantes, ...resposta.data.results]);
+    //         setProximaPagina(resposta.data.next);
+    //     } catch (erro) {
+    //         console.error(erro);
+    //     }
+    // }
 
     return (
         <section className={style.ListaRestaurantes}>
@@ -42,7 +42,24 @@ const ListaRestaurantes = () => {
             {restaurantes?.map((item) => (
                 <Restaurante restaurante={item} key={item.id} />
             ))}
-            {proximaPagina && <button onClick={verMais}> ver mais </button>}
+            <button
+                onClick={() =>
+                    paginaAnterior && fetchRestaurantes(paginaAnterior)
+                }
+                disabled={!paginaAnterior}
+            >
+                {" "}
+                Página anterior{" "}
+            </button>
+            <button
+                onClick={() =>
+                    proximaPagina && fetchRestaurantes(proximaPagina)
+                }
+                disabled={!proximaPagina}
+            >
+                {" "}
+                Próxima página{" "}
+            </button>
         </section>
     );
 };
