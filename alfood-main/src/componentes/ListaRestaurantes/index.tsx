@@ -2,17 +2,29 @@ import React, { useEffect } from "react";
 import IRestaurante from "../../interfaces/IRestaurante";
 import style from "./ListaRestaurantes.module.scss";
 import Restaurante from "./Restaurante";
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { IPaginacao } from "../../interfaces/IPaginacao";
+
+interface IParametrosBusca {
+    ordering?: string;
+    search?: string;
+}
 
 const ListaRestaurantes = () => {
     const [restaurantes, setRestaurantes] = React.useState<IRestaurante[]>([]);
     const [proximaPagina, setProximaPagina] = React.useState("");
     const [paginaAnterior, setPaginaAnterior] = React.useState("");
+    const [busca, setBusca] = React.useState("");
 
-    async function fetchRestaurantes(url: string) {
+    async function fetchRestaurantes(
+        url: string,
+        opcoes: AxiosRequestConfig = {}
+    ) {
         try {
-            const resposta = await axios.get<IPaginacao<IRestaurante>>(url);
+            const resposta = await axios.get<IPaginacao<IRestaurante>>(
+                url,
+                opcoes
+            );
             setRestaurantes(resposta.data.results);
             setProximaPagina(resposta.data.next);
             setPaginaAnterior(resposta.data.previous);
@@ -23,22 +35,33 @@ const ListaRestaurantes = () => {
     useEffect(() => {
         fetchRestaurantes("http://localhost:8000/api/v1/restaurantes/");
     }, []);
-    // async function verMais(): Promise<void> {
-    //     try {
-    //         const resposta =
-    //             await axios.get<IPaginacao<IRestaurante>>(proximaPagina);
-    //         setRestaurantes([...restaurantes, ...resposta.data.results]);
-    //         setProximaPagina(resposta.data.next);
-    //     } catch (erro) {
-    //         console.error(erro);
-    //     }
-    // }
+
+    function buscar(evento: React.FormEvent<HTMLFormElement>) {
+        evento.preventDefault();
+        const opcoes: AxiosRequestConfig = {
+            params: {} as IParametrosBusca,
+        };
+
+        if (busca) {
+            opcoes.params.search = busca;
+        }
+
+        fetchRestaurantes("http://localhost:8000/api/v1/restaurantes/", opcoes);
+    }
 
     return (
         <section className={style.ListaRestaurantes}>
             <h1>
                 Os restaurantes mais <em>bacanas</em>!
             </h1>
+            <form onSubmit={buscar}>
+                <input
+                    type="text"
+                    value={busca}
+                    onChange={(evento) => setBusca(evento.target.value)}
+                />
+                <button type="submit">buscar</button>
+            </form>
             {restaurantes?.map((item) => (
                 <Restaurante restaurante={item} key={item.id} />
             ))}
