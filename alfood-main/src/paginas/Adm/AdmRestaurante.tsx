@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import IRestaurante from "../../interfaces/IRestaurante";
 import {
+    Button,
     Paper,
     Table,
     TableBody,
@@ -28,12 +29,27 @@ const AdmRestaurante = () => {
         fetchAdmRestaurantes();
     }, []);
 
+    async function deleteRestaurantes(exlusaoNomeRestaurante: IRestaurante) {
+        try {
+            await axios.delete<IRestaurante>(
+                `http://localhost:8000/api/v2/restaurantes/${exlusaoNomeRestaurante.id}/`
+            );
+            const listaDelete = restaurante.filter(
+                (restaurante) => restaurante.id !== exlusaoNomeRestaurante.id
+            );
+            setRestaurantes([...listaDelete]);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <TableContainer component={Paper}>
             <Table>
                 <TableHead>
                     <TableCell>Nome</TableCell>
                     <TableCell>Editar</TableCell>
+                    <TableCell>Excluir</TableCell>
                 </TableHead>
                 <TableBody>
                     {restaurante.map((restaurante) => (
@@ -45,6 +61,17 @@ const AdmRestaurante = () => {
                                 >
                                     Editar
                                 </Link>
+                            </TableCell>
+                            <TableCell>
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    onClick={() =>
+                                        deleteRestaurantes(restaurante)
+                                    }
+                                >
+                                    Excluir
+                                </Button>
                             </TableCell>
                         </TableRow>
                     ))}
