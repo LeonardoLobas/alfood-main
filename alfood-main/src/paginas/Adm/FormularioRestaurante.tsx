@@ -1,8 +1,8 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import axios from "axios";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import IRestaurante from "../../interfaces/IRestaurante";
+import http from "../../http/http";
 
 const FormularioRestaurante = () => {
     const [nomeRestaurante, setNomeRestaurante] = React.useState("");
@@ -13,8 +13,8 @@ const FormularioRestaurante = () => {
         async function fetchRestaurante() {
             if (parametro.id) {
                 try {
-                    const respostas = await axios.get<IRestaurante>(
-                        `http://localhost:8000/api/v2/restaurantes/${parametro.id}/`
+                    const respostas = await http.get<IRestaurante>(
+                        `restaurantes/${parametro.id}/`
                     );
                     setNomeRestaurante(respostas.data.nome);
                 } catch (erro) {
@@ -31,8 +31,8 @@ const FormularioRestaurante = () => {
         if (parametro.id) {
             const putNameRestaurant = async () => {
                 try {
-                    const resposta = await axios.put(
-                        `http://localhost:8000/api/v2/restaurantes/${parametro.id}/`,
+                    const resposta = await http.put(
+                        `restaurantes/${parametro.id}/`,
                         { nome: nomeRestaurante }
                     );
                     setNomeRestaurante(resposta.data.nome);
@@ -44,10 +44,9 @@ const FormularioRestaurante = () => {
         } else {
             const postNameRestaurant = async () => {
                 try {
-                    const resposta = await axios.post(
-                        "http://localhost:8000/api/v2/restaurantes/",
-                        { nome: nomeRestaurante }
-                    );
+                    const resposta = await http.post("restaurantes/", {
+                        nome: nomeRestaurante,
+                    });
                     console.log(resposta);
                 } catch (error) {
                     console.log(error);

@@ -10,17 +10,15 @@ import {
     TableHead,
     TableRow,
 } from "@mui/material";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import http from "../../http/http";
 
 const AdmRestaurante = () => {
     const [restaurante, setRestaurantes] = React.useState<IRestaurante[]>([]);
     useEffect(() => {
         async function fetchAdmRestaurantes() {
             try {
-                const resposta = await axios.get(
-                    "http://localhost:8000/api/v2/restaurantes/"
-                );
+                const resposta = await http.get("restaurantes/");
                 setRestaurantes(resposta.data);
             } catch (error) {
                 console.log(error);
@@ -31,8 +29,8 @@ const AdmRestaurante = () => {
 
     async function deleteRestaurantes(exlusaoNomeRestaurante: IRestaurante) {
         try {
-            await axios.delete<IRestaurante>(
-                `http://localhost:8000/api/v2/restaurantes/${exlusaoNomeRestaurante.id}/`
+            await http.delete<IRestaurante>(
+                `restaurantes/${exlusaoNomeRestaurante.id}/`
             );
             const listaDelete = restaurante.filter(
                 (restaurante) => restaurante.id !== exlusaoNomeRestaurante.id
