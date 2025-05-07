@@ -47,7 +47,7 @@ const ListaRestaurantes = () => {
             opcoes.params.search = busca;
         }
         if (ordenacao) {
-            opcoes.params.orderning = ordenacao;
+            opcoes.params.ordering = ordenacao;
         }
 
         fetchRestaurantes("http://localhost:8000/api/v1/restaurantes/", opcoes);
